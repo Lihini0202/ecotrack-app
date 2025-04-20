@@ -6,9 +6,9 @@
     "scripts": {
         "release": "standard-version",
         "test": "echo \"Run all tests\" && exit 0",
-        "test:unit": "echo \"✅ Unit tests passed!\" && exit 0",
-        "test:integration": "echo \"✅ Integration tests passed!\" && exit 0",
-        "test:e2e": "echo \"✅ E2E tests passed!\" && exit 0"
+        "test:unit": "jest --coverage --outputFile=backend/reports/unit/test-results.xml",
+        "test:integration": "mocha --reporter mocha-junit-reporter --reporter-options mochaFile=backend/reports/integration/test-results.xml",
+        "test:e2e": "cypress run --reporter junit --reporter-options mochaFile=backend/reports/e2e/test-results.xml"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.0",
@@ -25,6 +25,7 @@
     },
     "devDependencies": {
         "jest": "^29.7.0",
+        "jest-junit": "^16.0.0",
         "nodemon": "^3.0.2",
         "standard-version": "^9.5.0",
         "supertest": "^7.1.0"
