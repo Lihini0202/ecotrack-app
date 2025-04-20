@@ -5,6 +5,7 @@ on:
     branches: [ lihini, main ]
   pull_request:
     branches: [ lihini, main ]
+    workflow_dispatch:
 
 jobs:
   unit-tests:
