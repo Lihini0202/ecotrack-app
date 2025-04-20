@@ -8,6 +8,8 @@ on:
 jobs:
   check-sla:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write # ensures permission to comment
     steps:
       - name: Check for overdue P1/P2 issues
         uses: actions/github-script@v6
@@ -27,14 +29,18 @@ jobs:
               const createdAt = new Date(issue.created_at);
               const ageHours = (now - createdAt) / 1000 / 60 / 60;
 
-              let slaHours = issue.labels.some(l => l.name === 'P1 - Critical') ? 24 : 72;
+              const labelNames = issue.labels.map(label => 
+                typeof label === 'string' ? label : label.name
+              );
+
+              const slaHours = labelNames.includes('P1 - Critical') ? 24 : 72;
 
               if (ageHours > slaHours) {
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issue.number,
-                  body: ` This issue has passed its SLA window of ${slaHours} hours. Please address or re-prioritize it.`
+                  body: `⏰ This issue has passed its SLA window of ${slaHours} hours. Please address or re-prioritize it.`
                 });
               }
             }
