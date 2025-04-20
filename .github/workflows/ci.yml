@@ -28,7 +28,7 @@ jobs:
 
       - run: cd backend && npm run test:unit
 
-      - name: Ensure report directory exists
+      - name: Ensure unit test report directory exists
         run: mkdir -p backend/reports/unit
 
       - name: Upload unit test report
@@ -57,7 +57,7 @@ jobs:
 
       - run: cd backend && npm run test:integration
 
-      - name: Ensure report directory exists
+      - name: Ensure integration test report directory exists
         run: mkdir -p backend/reports/integration
 
       - name: Upload integration test report
@@ -86,7 +86,7 @@ jobs:
 
       - run: cd backend && npm run test:e2e
 
-      - name: Ensure report directory exists
+      - name: Ensure E2E test report directory exists
         run: mkdir -p backend/reports/e2e
 
       - name: Upload E2E test report
