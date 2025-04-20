@@ -1,19 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
-
 const mongoose = require('mongoose');
 const cors = require('cors');
-const morgan = require('morgan');
+
 const authRoutes = require('./routes/authRoutes');
 const goalRoutes = require('./routes/goalRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const coachRoutes = require('./routes/coachRoutes');
-const errorHandler = require('./utils/errorHandler');
 const profileRoutes = require('./routes/profile');
-
-
+const errorHandler = require('./utils/errorHandler');
 
 const app = express();
 
@@ -21,6 +18,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
+
+// Metrics counter
+let requestCount = 0;
+app.use((req, res, next) => {
+  requestCount++;
+  next();
+});
+
+app.get('/metrics', (req, res) => {
+  res.json({
+    uptime: process.uptime(),
+    memoryUsage: process.memoryUsage(),
+    requestCount
+  });
+});
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -33,9 +45,7 @@ app.use('/api/goals', goalRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/coach', coachRoutes);
-
 app.use('/api/profile', profileRoutes);
-
 
 // Error handling middleware
 app.use(errorHandler);
