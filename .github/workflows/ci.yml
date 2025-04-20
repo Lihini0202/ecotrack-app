@@ -11,31 +11,93 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+      
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      
       - run: cd backend && npm install
+      
       - run: cd backend && npm run test:unit
+      
+      - name: Upload unit test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-report
+          path: backend/reports/unit/
 
   integration-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+      
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - run: cd backend && npm install
+      
       - run: cd backend && npm run test:integration
+
+      - name: Upload integration test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-report
+          path: backend/reports/integration/
 
   e2e-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      
       - run: cd backend && npm install
+      
       - run: cd backend && npm run test:e2e
+
+      - name: Upload E2E test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-report
+          path: backend/reports/e2e/
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - run: cd backend && npm install
+      
+      - name: Run npm audit
+        run: |
+          cd backend
+          npm audit --audit-level=high
