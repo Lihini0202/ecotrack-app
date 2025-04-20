@@ -32,7 +32,7 @@ jobs:
         run: mkdir -p backend/reports/unit
 
       - name: Upload unit test report
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: unit-test-report
           path: backend/reports/unit/
@@ -61,7 +61,7 @@ jobs:
         run: mkdir -p backend/reports/integration
 
       - name: Upload integration test report
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: integration-test-report
           path: backend/reports/integration/
@@ -90,7 +90,7 @@ jobs:
         run: mkdir -p backend/reports/e2e
 
       - name: Upload E2E test report
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: e2e-test-report
           path: backend/reports/e2e/
