@@ -6,7 +6,9 @@ on:
   pull_request:
     branches: [ lihini, main ]
 
+
      workflow_dispatch:
+
 
 
 jobs:
@@ -28,6 +30,7 @@ jobs:
 
       - run: cd backend && npm install
 
+
       - name: Run unit tests
         run: |
           cd backend
@@ -35,6 +38,7 @@ jobs:
 
       - name: Upload unit test report
         uses: actions/upload-artifact@v4
+
         with:
           name: unit-test-report
           path: backend/reports/unit/
@@ -57,6 +61,7 @@ jobs:
 
       - run: cd backend && npm install
 
+
       - name: Run integration tests
         run: |
           cd backend
@@ -64,9 +69,6 @@ jobs:
 
       - name: Upload integration test report
         uses: actions/upload-artifact@v4
-        with:
-          name: integration-test-report
-          path: backend/reports/integration/
 
 
   e2e-tests:
@@ -92,8 +94,10 @@ jobs:
           cd backend
           npm run test:e2e
 
+
       - name: Upload e2e test report
         uses: actions/upload-artifact@v4
+
 
         with:
           name: e2e-test-report
