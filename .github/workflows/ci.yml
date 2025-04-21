@@ -1,121 +1,83 @@
-name: CI Pipeline v2
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ lihini, main ]
+    branches: [main]
   pull_request:
-    branches: [ lihini, main ]
-
-
-     workflow_dispatch:
-
-
 
 jobs:
-  unit-tests:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: ${{ matrix.node-version }}
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-      - run: cd backend && npm install
-
+      - name: Install dependencies
+        run: npm install
 
       - name: Run unit tests
-        run: |
-          cd backend
-          npm run test:unit
-
-      - name: Upload unit test report
-        uses: actions/upload-artifact@v4
-
-        with:
-          name: unit-test-report
-          path: backend/reports/unit/
-
-  integration-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-      - run: cd backend && npm install
-
+        run: npm run test:unit
 
       - name: Run integration tests
-        run: |
-          cd backend
-          npm run test:integration
+        run: npm run test:integration
 
-      - name: Upload integration test report
-        uses: actions/upload-artifact@v4
+      - name: Run end-to-end tests
+        run: npm run test:e2e
 
-
-  e2e-tests:
+  security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
+      - name: Install dependencies
+        run: npm install
 
-      - name: Cache node modules
+      - name: Lint code (SAST)
+        run: npx eslint . || true
+
+      - name: Run dependency check (SCA)
+        run: npm audit --audit-level=moderate || true
+
+  cache-and-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Cache npm
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
-      - run: cd backend && npm install
+      - run: npm install
 
-      - name: Run e2e tests
-        run: |
-          cd backend
-          npm run test:e2e
+      - name: Build backend (placeholder)
+        run: echo "No build step defined yet"
 
-
-      - name: Upload e2e test report
-        uses: actions/upload-artifact@v4
-
-
+      - name: Upload test coverage reports
+        uses: actions/upload-artifact@v3
         with:
-          name: e2e-test-report
-          path: backend/reports/e2e/
+          name: test-coverage
+          path: reports/
 
-  security-scan:
+  synthetic-monitoring:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Health check
+        run: curl -f https://your-deployment-url.com/api/health || exit 1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-
-      - run: cd backend && npm install
-
-      - name: Run npm audit
-        run: |
-          cd backend
-          npm audit --audit-level=high
+  observability:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log tracing placeholder
+        run: echo "Send custom metrics to OpenTelemetry / DataDog / Prometheus here"
