@@ -3,13 +3,16 @@
     "version": "1.0.1",
     "description": "Backend for EcoTrack app",
     "main": "server.js",
-    "scripts": {
-        "release": "standard-version",
-        "test": "jest",
-        "test:unit": "jest tests/unit --coverage --coverageDirectory=reports/unit",
-        "test:integration": "jest tests/integration --coverage --coverageDirectory=reports/integration",
-        "test:e2e": "jest tests/e2e --coverage --coverageDirectory=reports/e2e"
-    },
+
+   "scripts": {
+  "release": "standard-version",
+  "test": "jest",
+  "test:unit": "jest tests/unit --coverage --coverageDirectory=reports/unit",
+  "test:integration": "jest tests/integration --coverage --coverageDirectory=reports/integration",
+  "test:e2e": "jest tests/e2e --coverage --coverageDirectory=reports/e2e"
+},
+
+
     "dependencies": {
         "@google/generative-ai": "^0.24.0",
         "axios": "^1.6.2",
