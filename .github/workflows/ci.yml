@@ -1,11 +1,15 @@
-name: CI Pipeline
+name: CI Pipeline v2
 
 on:
   push:
     branches: [ lihini, main ]
   pull_request:
     branches: [ lihini, main ]
+<<<<<<< HEAD
      workflow_dispatch:
+=======
+  workflow_dispatch:
+>>>>>>> a17d1e8 (✅ Add test scripts and update CI workflow with sample Jest tests)
 
 jobs:
   unit-tests:
@@ -26,7 +30,20 @@ jobs:
 
       - run: cd backend && npm install
 
+<<<<<<< HEAD
       - run: cd backend && npm run test:unit
+=======
+      - name: Run unit tests
+        run: |
+          cd backend
+          npm run test:unit
+
+      - name: Upload unit test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: backend/reports/unit/
+>>>>>>> a17d1e8 (✅ Add test scripts and update CI workflow with sample Jest tests)
 
       - name: Ensure report directory exists
         run: mkdir -p backend/reports/unit
@@ -55,7 +72,20 @@ jobs:
 
       - run: cd backend && npm install
 
+<<<<<<< HEAD
       - run: cd backend && npm run test:integration
+=======
+      - name: Run integration tests
+        run: |
+          cd backend
+          npm run test:integration
+
+      - name: Upload integration test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-report
+          path: backend/reports/integration/
+>>>>>>> a17d1e8 (✅ Add test scripts and update CI workflow with sample Jest tests)
 
       - name: Ensure report directory exists
         run: mkdir -p backend/reports/integration
@@ -84,6 +114,7 @@ jobs:
 
       - run: cd backend && npm install
 
+<<<<<<< HEAD
       - run: cd backend && npm run test:e2e
 
       - name: Ensure report directory exists
@@ -91,6 +122,15 @@ jobs:
 
       - name: Upload E2E test report
         uses: actions/upload-artifact@v3.1.2  # Updated version
+=======
+      - name: Run e2e tests
+        run: |
+          cd backend
+          npm run test:e2e
+
+      - name: Upload e2e test report
+        uses: actions/upload-artifact@v4
+>>>>>>> a17d1e8 (✅ Add test scripts and update CI workflow with sample Jest tests)
         with:
           name: e2e-test-report
           path: backend/reports/e2e/
