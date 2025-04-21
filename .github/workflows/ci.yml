@@ -5,7 +5,11 @@ on:
     branches: [ lihini, main ]
   pull_request:
     branches: [ lihini, main ]
-  workflow_dispatch:
+
+
+     workflow_dispatch:
+
+
 
 jobs:
   unit-tests:
@@ -26,13 +30,15 @@ jobs:
 
       - run: cd backend && npm install
 
-      - run: cd backend && npm run test:unit
 
-      - name: Ensure unit test report directory exists
-        run: mkdir -p backend/reports/unit
+      - name: Run unit tests
+        run: |
+          cd backend
+          npm run test:unit
 
       - name: Upload unit test report
-        uses: actions/upload-artifact@v4.0.0
+        uses: actions/upload-artifact@v4
+
         with:
           name: unit-test-report
           path: backend/reports/unit/
@@ -55,16 +61,15 @@ jobs:
 
       - run: cd backend && npm install
 
-      - run: cd backend && npm run test:integration
 
-      - name: Ensure integration test report directory exists
-        run: mkdir -p backend/reports/integration
+      - name: Run integration tests
+        run: |
+          cd backend
+          npm run test:integration
 
       - name: Upload integration test report
-        uses: actions/upload-artifact@v4.0.0
-        with:
-          name: integration-test-report
-          path: backend/reports/integration/
+        uses: actions/upload-artifact@v4
+
 
   e2e-tests:
     runs-on: ubuntu-latest
@@ -84,13 +89,16 @@ jobs:
 
       - run: cd backend && npm install
 
-      - run: cd backend && npm run test:e2e
+      - name: Run e2e tests
+        run: |
+          cd backend
+          npm run test:e2e
 
-      - name: Ensure E2E test report directory exists
-        run: mkdir -p backend/reports/e2e
 
-      - name: Upload E2E test report
-        uses: actions/upload-artifact@v4.0.0
+      - name: Upload e2e test report
+        uses: actions/upload-artifact@v4
+
+
         with:
           name: e2e-test-report
           path: backend/reports/e2e/
