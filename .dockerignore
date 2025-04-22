@@ -1,0 +1,16 @@
+# flyctl launch added from .gitignore
+# Node modules
+**\node_modules
+
+# Environment files
+**\.env
+backend\.env
+
+# React Native
+**\.expo
+**\.expo-shared
+**\*.log
+
+# System files
+**\.DS_Store
+fly.toml
