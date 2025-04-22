@@ -18,3 +18,7 @@ primary_region = 'bom'
   memory = '2gb'
   cpu_kind = 'shared'
   cpus = 1
+
+[services.healthy_checks]
+path = "/api/health"
+interval = "30s"
