@@ -73,28 +73,36 @@ jobs:
         working-directory: ./backend
 
   cache-and-artifacts:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: Cache npm
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+    - name: Cache npm
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
-      - run: npm install
-        working-directory: ./backend
+    - name: Install dependencies
+      run: npm install
+      working-directory: ./backend
 
-      - name: Build backend (placeholder)
-        run: echo "No build step defined yet"
+    - name: List all coverage reports (debugging)
+      run: ls -R ./backend/reports || echo "No coverage reports found"
+      working-directory: ./backend
 
-      - name: Upload test coverage reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-coverage
-          path: reports/
+    - name: Upload test coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-coverage
+        path: |
+          ./backend/reports/unit
+          ./backend/reports/integration
+          ./backend/reports/e2e
+        if-no-files-found: warn
+        compression-level: 6
+
 
 
   observability:
