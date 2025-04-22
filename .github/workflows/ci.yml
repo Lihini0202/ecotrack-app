@@ -78,11 +78,6 @@ jobs:
           name: test-coverage
           path: reports/
 
-  synthetic-monitoring:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Health check
-        run: curl -f https://ecotrackapp.fly.dev/api/health || exit 1
 
   observability:
     runs-on: ubuntu-latest

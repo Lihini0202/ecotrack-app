@@ -19,6 +19,3 @@ primary_region = 'bom'
   cpu_kind = 'shared'
   cpus = 1
 
-[services.healthy_checks]
-path = "/api/health"
-interval = "30s"
