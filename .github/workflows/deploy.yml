@@ -1,7 +1,7 @@
 name: Deploy to Fly.io
 
 on:
- workflow_dispatch:  # trigger  manually
+  workflow_dispatch:
   push:
     branches:
       - prod
@@ -18,18 +18,22 @@ jobs:
         run: |
           if [[ "${GITHUB_REF_NAME}" == "prod" ]]; then
             echo "APP_NAME=ecotrackapp" >> $GITHUB_ENV
-            echo "FLY_SECRET_NAME=FLY_API_TOKEN_PROD" >> $GITHUB_ENV
+            echo "${{ secrets.FLY_API_TOKEN_PROD }}" >> fly_token.txt
           elif [[ "${GITHUB_REF_NAME}" == "staging" ]]; then
             echo "APP_NAME=ecotrackapp-staging" >> $GITHUB_ENV
-            echo "FLY_SECRET_NAME=FLY_API_TOKEN_STAGING" >> $GITHUB_ENV
+            echo "${{ secrets.FLY_API_TOKEN_STAGING }}" >> fly_token.txt
           elif [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
             echo "APP_NAME=ecotrackapp-dev" >> $GITHUB_ENV
-            echo "FLY_SECRET_NAME=FLY_API_TOKEN_DEV" >> $GITHUB_ENV
+            echo "${{ secrets.FLY_API_TOKEN_DEV }}" >> fly_token.txt
           fi
+
+      - name: Load token from file
+        run: |
+          echo "FLY_API_TOKEN=$(cat fly_token.txt)" >> $GITHUB_ENV
 
       - name: Deploy to Fly.io
         uses: superfly/flyctl-actions@1.3
         with:
           args: "deploy --remote-only --config ./backend/fly.toml --app ${{ env.APP_NAME }}"
         env:
-          FLY_API_TOKEN: ${{ secrets[env.FLY_SECRET_NAME] }}
+          FLY_API_TOKEN: ${{ env.FLY_API_TOKEN }}
