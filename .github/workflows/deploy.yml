@@ -35,4 +35,4 @@ jobs:
               github.ref_name == 'dev' && 'ecotrackapp-dev' 
             }}
         env:
-          FLY_API_TOKEN: ${{ secrets.flytoken }}
+          FLY_API_TOKEN: ${{ secrets.prod }}
