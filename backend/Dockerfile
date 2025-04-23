@@ -5,14 +5,15 @@ FROM node:16
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the container
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install the dependencies
 RUN npm install
 
-# Copy the rest of your app files
+# Copy the rest of your app files from the backend directory
 COPY backend/ .
-# Expose the port your app will run on (default is 8080 for Fly)
+
+# Expose the port your app will run on (use port 5000 if that's what you're exposing)
 EXPOSE 8080
 
 # Start the app
