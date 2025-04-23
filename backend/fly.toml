@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for ecotrackapp-main on 2025-04-23T21:20:22+05:30
+# fly.toml app configuration file generated for ecotrackapp on 2025-04-23T21:20:22+05:30
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'ecotrackapp-main'
+app = 'ecotrackapp'
 primary_region = 'bom'
 
 [build]
