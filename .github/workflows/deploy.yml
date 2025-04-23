@@ -3,9 +3,9 @@ name: Deploy to Fly.io
 on:
   push:
     branches:
-      - dev
+      - prod
       - staging
-      - prod  # Changed from 'main' to 'prod'
+      - dev
 
 jobs:
   deploy:
@@ -13,26 +13,32 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set Deployment Environment
+      # Set environment variables based on branch
+      - name: Set environment variables based on branch
+        id: set-env
         run: |
-          if [[ "${{ github.ref_name }}" == "prod" ]]; then  # Use 'prod' instead of 'main'
-            echo "FLY_TOKEN_NAME=FLY_API_TOKEN_PROD" >> $GITHUB_ENV
-          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "FLY_TOKEN_NAME=FLY_API_TOKEN_STAGING" >> $GITHUB_ENV
-          elif [[ "${{ github.ref_name }}" == "dev" ]]; then
-            echo "FLY_TOKEN_NAME=FLY_API_TOKEN_DEV" >> $GITHUB_ENV
+          if [[ "${GITHUB_REF_NAME}" == "prod" ]]; then
+            echo "FLY_APP=ecotrackapp-prod" >> $GITHUB_ENV
+            echo "FLY_TOKEN_NAME=prod" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF_NAME}" == "staging" ]]; then
+            echo "FLY_APP=ecotrackapp-staging" >> $GITHUB_ENV
+            echo "FLY_TOKEN_NAME=staging" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
+            echo "FLY_APP=ecotrackapp-dev" >> $GITHUB_ENV
+            echo "FLY_TOKEN_NAME=dev" >> $GITHUB_ENV
           else
-            echo "Unknown environment: ${{ github.ref_name }}"
+            echo "Unknown branch: ${GITHUB_REF_NAME}"
             exit 1
           fi
 
-      - name: Display Deployment Environment
-        run: |
-          echo "Deploying to ${{ github.ref_name }}"
+      # Show deployment target
+      - name: Show deployment target
+        run: echo "Deploying $FLY_APP using token $FLY_TOKEN_NAME"
 
+      # Deploy to Fly.io
       - name: Deploy to Fly.io
         uses: superfly/flyctl-actions@1.3
         with:
-          args: deploy --app ${{ github.ref_name == 'prod' && 'ecotrackapp-prod' || github.ref_name == 'staging' && 'ecotrackapp-staging' || github.ref_name == 'dev' && 'ecotrackapp-dev' }}
+          args: "deploy --remote-only --config ./backend/fly.toml --app ${{ env.FLY_APP }}"
         env:
-          FLY_API_TOKEN: ${{ secrets[env.FLY_TOKEN_NAME] }}
+          FLY_API_TOKEN: ${{ secrets['FLY_API_TOKEN_' + env.FLY_TOKEN_NAME | upper] }}
