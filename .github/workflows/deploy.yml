@@ -3,42 +3,67 @@ name: Deploy to Fly.io
 on:
   push:
     branches:
-      - prod
-      - staging
       - dev
+      - staging
+      - prod
 
 jobs:
-  deploy:
+  deploy-dev:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
     steps:
       - uses: actions/checkout@v3
 
-      # Set environment variables based on branch
-      - name: Set environment variables based on branch
-        id: set-env
+      # Set up environment for dev
+      - name: Set environment variables for dev
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "prod" ]]; then
-            echo "FLY_APP=ecotrackapp-prod" >> $GITHUB_ENV
-            echo "FLY_TOKEN_NAME=prod" >> $GITHUB_ENV
-          elif [[ "${GITHUB_REF_NAME}" == "staging" ]]; then
-            echo "FLY_APP=ecotrackapp-staging" >> $GITHUB_ENV
-            echo "FLY_TOKEN_NAME=staging" >> $GITHUB_ENV
-          elif [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
-            echo "FLY_APP=ecotrackapp-dev" >> $GITHUB_ENV
-            echo "FLY_TOKEN_NAME=dev" >> $GITHUB_ENV
-          else
-            echo "Unknown branch: ${GITHUB_REF_NAME}"
-            exit 1
-          fi
+          echo "FLY_APP=ecotrackapp-dev" >> $GITHUB_ENV
+          echo "FLY_TOKEN_NAME=dev" >> $GITHUB_ENV
 
-      # Show deployment target
-      - name: Show deployment target
-        run: echo "Deploying $FLY_APP using token $FLY_TOKEN_NAME"
-
-      # Deploy to Fly.io
-      - name: Deploy to Fly.io
+      # Deploy to Fly.io for dev
+      - name: Deploy to Fly.io (dev)
         uses: superfly/flyctl-actions@1.3
         with:
           args: "deploy --remote-only --config ./backend/fly.toml --app ${{ env.FLY_APP }}"
         env:
-          FLY_API_TOKEN: ${{ secrets['FLY_API_TOKEN_' + env.FLY_TOKEN_NAME | upper] }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_DEV }}
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+    steps:
+      - uses: actions/checkout@v3
+
+      # Set up environment for staging
+      - name: Set environment variables for staging
+        run: |
+          echo "FLY_APP=ecotrackapp-staging" >> $GITHUB_ENV
+          echo "FLY_TOKEN_NAME=staging" >> $GITHUB_ENV
+
+      # Deploy to Fly.io for staging
+      - name: Deploy to Fly.io (staging)
+        uses: superfly/flyctl-actions@1.3
+        with:
+          args: "deploy --remote-only --config ./backend/fly.toml --app ${{ env.FLY_APP }}"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_STAGING }}
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/prod'
+    steps:
+      - uses: actions/checkout@v3
+
+      # Set up environment for prod
+      - name: Set environment variables for prod
+        run: |
+          echo "FLY_APP=ecotrackapp-prod" >> $GITHUB_ENV
+          echo "FLY_TOKEN_NAME=prod" >> $GITHUB_ENV
+
+      # Deploy to Fly.io for prod
+      - name: Deploy to Fly.io (prod)
+        uses: superfly/flyctl-actions@1.3
+        with:
+          args: "deploy --remote-only --config ./backend/fly.toml --app ${{ env.FLY_APP }}"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_PROD }}
