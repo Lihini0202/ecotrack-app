@@ -11,8 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of your app files
-COPY . .
-
+COPY backend/ .
 # Expose the port your app will run on (default is 8080 for Fly)
 EXPOSE 8080
 
