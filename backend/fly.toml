@@ -7,7 +7,7 @@ app = 'ecotrackapp'
 primary_region = 'bom'
 
 [build]
-
+dockerfile = "./backend/Dockerfile"
 
 
 [http_service]
