@@ -5,7 +5,7 @@ on:
     branches:
       - dev
       - staging
-      - prod
+      - prod  # Changed from 'main' to 'prod'
 
 jobs:
   deploy:
@@ -13,20 +13,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Display Deployment Environment
+      - name: Set Deployment Environment
         run: |
-          if [[ "${{ github.ref_name }}" == "prod" ]]; then
-            echo "Deploying to Production"
+          if [[ "${{ github.ref_name }}" == "prod" ]]; then  # Use 'prod' instead of 'main'
             echo "FLY_TOKEN_NAME=FLY_API_TOKEN_PROD" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "Deploying to Staging"
             echo "FLY_TOKEN_NAME=FLY_API_TOKEN_STAGING" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "dev" ]]; then
-            echo "Deploying to Development"
             echo "FLY_TOKEN_NAME=FLY_API_TOKEN_DEV" >> $GITHUB_ENV
           else
             echo "Unknown environment: ${{ github.ref_name }}"
+            exit 1
           fi
+
+      - name: Display Deployment Environment
+        run: |
+          echo "Deploying to ${{ github.ref_name }}"
 
       - name: Deploy to Fly.io
         uses: superfly/flyctl-actions@1.3
