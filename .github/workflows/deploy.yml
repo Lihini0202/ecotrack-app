@@ -13,26 +13,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Display Deployment Environment
+      - name: Set environment variables based on branch
+        id: set-env
         run: |
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "Deploying to Production"
-          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "Deploying to Staging"
-          elif [[ "${{ github.ref_name }}" == "dev" ]]; then
-            echo "Deploying to Development"
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo "FLY_APP=ecotrackapp-prod" >> $GITHUB_ENV
+            echo "FLY_TOKEN_NAME=prod" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF_NAME}" == "staging" ]]; then
+            echo "FLY_APP=ecotrackapp-staging" >> $GITHUB_ENV
+            echo "FLY_TOKEN_NAME=staging" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
+            echo "FLY_APP=ecotrackapp-dev" >> $GITHUB_ENV
+            echo "FLY_TOKEN_NAME=dev" >> $GITHUB_ENV
           else
-            echo "Unknown environment: ${{ github.ref_name }}"
+            echo "Unknown branch: ${GITHUB_REF_NAME}"
+            exit 1
           fi
+
+      - name: Show deployment target
+        run: echo "Deploying $FLY_APP using token $FLY_TOKEN_NAME"
 
       - name: Deploy to Fly.io
         uses: superfly/flyctl-actions@1.3
         with:
-          args: >
-            deploy --app ${{ 
-              github.ref_name == 'main' && 'ecotrackapp-prod' || 
-              github.ref_name == 'staging' && 'ecotrackapp-staging' || 
-              github.ref_name == 'dev' && 'ecotrackapp-dev' 
-            }}
+          args: "deploy --remote-only --config ./backend/fly.toml --app ${{ env.FLY_APP }}"
         env:
-          FLY_API_TOKEN: ${{ secrets.prod }}
+          FLY_API_TOKEN: ${{ secrets[env.prod] }}
