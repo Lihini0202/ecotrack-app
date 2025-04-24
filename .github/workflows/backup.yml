@@ -17,3 +17,4 @@ jobs:
 
       - name: Create Snapshot
         run: fly pg create snapshot ecotrack-db-v2
+        
