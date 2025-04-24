@@ -1,0 +1,19 @@
+name: Daily DB Backup
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Every day at midnight UTC
+  workflow_dispatch:     # Allow manual runs
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Fly CLI
+        uses: superfly/flyctl-action@v1
+        with:
+          api_key: ${{ secrets.FLY_API_KEY }}
+
+      - name: Create Snapshot
+        run: fly pg create snapshot ecotrack-db-v2
