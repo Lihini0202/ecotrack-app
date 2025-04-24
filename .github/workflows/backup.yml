@@ -16,7 +16,7 @@ jobs:
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
       - name: Authenticate with Fly.io
-        run: ~/.fly/bin/flyctl auth token ${{ secrets.FLY_API_KEY }}
+        run: ~/.fly/bin/flyctl auth token ${{ secrets.FLY_APP }}
 
       - name: Create DB Snapshot
         run: ~/.fly/bin/flyctl postgres snapshots create -a ecotrack-db-v2
