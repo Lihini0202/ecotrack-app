@@ -3,7 +3,7 @@ name: Daily DB Backup
 on:
   schedule:
     - cron: '0 0 * * *'  # Every day at midnight UTC
-  workflow_dispatch:     # Allow manual runs
+  workflow_dispatch:     
 
 jobs:
   backup:
