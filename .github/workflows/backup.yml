@@ -18,5 +18,4 @@ jobs:
       - name: Create DB Snapshot
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_APP }}
-        run: ~/.fly/bin/flyctl postgres snapshot create --name ecotrack-db-v2
-
+        run: ~/.fly/bin/flyctl postgres snapshot create
