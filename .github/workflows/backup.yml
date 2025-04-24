@@ -14,7 +14,7 @@ jobs:
         uses: superfly/flyctl-actions@1.3
 
       - name: Authenticate Fly CLI
-        run: flyctl auth token ${{ secrets.FLY_API_KEY }}
+        run: flyctl auth token ${{ secrets.FLY_APP }}
 
       - name: Create Snapshot
         run: flyctl pg create snapshot ecotrack-db-v2
