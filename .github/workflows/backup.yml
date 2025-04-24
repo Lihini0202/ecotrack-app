@@ -2,8 +2,8 @@ name: Daily DB Backup
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Daily at midnight UTC
-  workflow_dispatch:      # Manual trigger support
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:     # Allows manual trigger
 
 jobs:
   backup:
@@ -17,4 +17,4 @@ jobs:
         run: flyctl auth token ${{ secrets.FLY_APP }}
 
       - name: Create Snapshot
-        run: flyctl pg create snapshot ecotrack-db-v2
+        run: flyctl postgres snapshots create -a ecotrack-db-v2
