@@ -15,7 +15,7 @@ jobs:
         uses: superfly/flyctl-actions@1.3
 
         with:
-          api_key: ${{ secrets.FLY_API_KEY }}
+          api_key: ${{ secrets.FLY_APP }}
 
       - name: Create Snapshot
         run: fly pg create snapshot ecotrack-db-v2
