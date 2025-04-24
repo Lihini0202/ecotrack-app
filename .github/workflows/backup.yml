@@ -2,7 +2,7 @@ name: Daily DB Backup
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Daily at midnight UTC
+    - cron: '0 0 * * *'  
   workflow_dispatch:     # Manual trigger
 
 jobs:
@@ -15,8 +15,7 @@ jobs:
           curl -L https://fly.io/install.sh | sh
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
-      - name: Authenticate with Fly.io
-        run: ~/.fly/bin/flyctl auth token ${{ secrets.FLY_APP }}
-
       - name: Create DB Snapshot
+        env:
+          FLY_ACCESS_TOKEN: ${{ secrets.FLY_APP }}
         run: ~/.fly/bin/flyctl postgres snapshots create -a ecotrack-db-v2
