@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Install Fly CLI
         run: |
           curl -L https://fly.io/install.sh | sh
@@ -19,3 +20,4 @@ jobs:
         env:
           FLY_ACCESS_TOKEN: ${{ secrets.FLY_APP }}
         run: ~/.fly/bin/flyctl postgres snapshot create
+
