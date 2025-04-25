@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - name: Set up Fly CLI
+
         uses: superfly/flyctl-action@v2
+
         with:
           api_key: ${{ secrets.FLY_API_KEY }}
 
