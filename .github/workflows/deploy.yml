@@ -10,16 +10,63 @@ on:
       - staging
       - prod
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+jobs:
+  # This workflow used to deploy straight from a push with nothing verifying
+  # the code first, so a broken commit on dev/staging/prod shipped. The same
+  # gate ci.yml applies to main now runs here before anything is deployed.
+  verify:
+    name: Tests and Lint
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Cache mongodb-memory-server binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongod-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-mongod-
+
+      - run: npm ci
+        working-directory: ./backend
+
+      - run: npm run test:unit
+        working-directory: ./backend
+
+      - run: npm run test:integration
+        working-directory: ./backend
+
+      - run: npm run test:e2e
+        working-directory: ./backend
+
+      - run: npx eslint .
+        working-directory: ./backend
+
+      - run: npm audit --audit-level=moderate
+        working-directory: ./backend
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Set up Fly.io
         uses: superfly/flyctl-actions@1.3
         with:
-          args: "deploy --config backend/fly.toml"
+          # Deploy from ./backend so the build context matches the relative
+          # COPY paths in backend/Dockerfile. The previous
+          # `--config backend/fly.toml` form used the repo root as context,
+          # where there is no Dockerfile at all.
+          args: "deploy --remote-only ./backend"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_APP }}
