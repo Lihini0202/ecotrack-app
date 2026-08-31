@@ -1,20 +1,35 @@
-# Use the official Node.js image from Docker Hub
-FROM node:16
+# node:16 reached end of life in September 2023 and receives no security
+# patches. node:20-slim is on LTS and ships a much smaller base image.
+FROM node:20-slim
 
-# Set the working directory in the container
+ENV NODE_ENV=production \
+    PORT=8080
+
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
-COPY backend/package*.json ./
+# The build context is ./backend (see docker-compose.yml and the flyctl
+# invocations in .github/workflows), so every path here is relative to the
+# backend directory. Manifests are copied first so the dependency layer is
+# reused whenever only application code changes.
+COPY package.json package-lock.json ./
 
-# Install the dependencies
-RUN npm install
+# npm ci installs exactly what package-lock.json pins and fails if the two
+# files disagree; npm install would silently resolve newer versions.
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy the rest of your app files from the backend directory
-COPY backend/ .
+COPY . .
 
-# Expose the port your app will run on (use port 5000 if that's what you're exposing)
+# node:20-slim ships an unprivileged `node` user (uid 1000). Give it ownership
+# of the app directory so nothing in the running container needs root.
+RUN chown -R node:node /app
+USER node
+
 EXPOSE 8080
 
-# Start the app
+# /health returns 503 while mongoose is disconnected, so an instance that
+# cannot reach Atlas is reported unhealthy instead of merely "up". node is
+# already in the image, which avoids installing curl just to probe a port.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD node -e "require('http').get({host:'127.0.0.1',port:process.env.PORT||8080,path:'/health'},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+
 CMD ["npm", "start"]

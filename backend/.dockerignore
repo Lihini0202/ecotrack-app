@@ -1,10 +1,15 @@
-# backend/.dockerignore
+# backend/.dockerignore - the build context is this directory
 node_modules
 npm-debug.log
 Dockerfile
 .dockerignore
 .env
+.env.*
 .git
 .vscode
 coverage
+reports
+tests
+jest.config.js
+eslint.config.mjs
 *.log
