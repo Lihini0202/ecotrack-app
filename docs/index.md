@@ -14,8 +14,9 @@ Check out our **[Getting Started Guide](tutorials/getting-started.md)** to set u
 - **[API Key Rotation](howtos/rotate-api-keys.md)**
 
 ## Reference
-- **[Deployment Method ADR](reference/adr-001-deploy-method.md)**
+- **[Deployment Method ADR](reference/deploy-method.md)**
 - **[API Permissions](reference/api-permissions.md)**
+- **[Configuration Schema](reference/config-schema.md)**
 
 ---
 
