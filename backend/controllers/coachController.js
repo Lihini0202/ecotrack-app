@@ -2,7 +2,6 @@ const Message = require('../models/Message');
 const User = require('../models/User');
 const Activity = require('../models/Activity');
 const { generateEcoResponse } = require('../services/openaiService');
-const authMiddleware = require('../utils/authMiddleware');
 
 // Send message to coach and get response
 exports.sendMessage = async (req, res, next) => {
