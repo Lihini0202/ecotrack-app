@@ -1,11 +1,22 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     ports:
       - "8080:8080"
     volumes:
+      # Mount source for live reload, but keep the image's node_modules
+      # (an unqualified bind mount would shadow them with the host's).
       - ./backend:/app
+      - /app/node_modules
+    # Values come from the .env file in this directory (see .env.example).
+    # Compose reads it automatically; it is gitignored.
     environment:
       - NODE_ENV=development
-      - MONGODB_URI=mongodb+srv://lilysewmi:butter1@cluster0.1hxi6vq.mongodb.net/ecotrack?retryWrites=true&w=majority&appName=Cluster0
+      - PORT=8080
+      - MONGODB_URI=${MONGODB_URI:?set MONGODB_URI in .env}
+      - JWT_SECRET=${JWT_SECRET:?set JWT_SECRET in .env}
+      - NEWS_API_KEY=${NEWS_API_KEY:-}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     command: npm start
