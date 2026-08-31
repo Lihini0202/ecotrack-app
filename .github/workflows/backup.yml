@@ -1,23 +1,86 @@
-name: Daily DB Backup
+name: Daily MongoDB Backup
+
+# Dumps the MongoDB Atlas database with mongodump and stores the archive in
+# S3.
+#
+# The previous version of this workflow ran `flyctl postgres snapshot create`.
+# EcoTrack has no Postgres and no Fly volume - it stores everything in Atlas -
+# so that command snapshotted nothing while the job still reported success.
+#
+# Required repository secrets:
+#   MONGODB_URI          Atlas connection string for a backup user with the
+#                        built-in `backup` role (read-only is enough).
+#   AWS_BACKUP_ROLE_ARN  IAM role this repo may assume via GitHub OIDC, with
+#                        s3:PutObject on the target bucket. Using OIDC avoids
+#                        storing long-lived AWS keys in the repository.
+#   AWS_BACKUP_BUCKET    Destination bucket name.
+#
+# Retention is intentionally not handled here: an S3 lifecycle rule on the
+# bucket prefix expires old archives, so no scheduled job needs delete
+# permission on the backup bucket.
 
 on:
   schedule:
-    - cron: '0 0 * * *'  
-  workflow_dispatch:     # Manual trigger
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # required for the OIDC token used to assume the AWS role
+
+env:
+  MONGODB_TOOLS_VERSION: '100.10.0'
+  AWS_REGION: ap-south-1
 
 jobs:
   backup:
     runs-on: ubuntu-latest
-
     steps:
-
-      - name: Install Fly CLI
+      - name: Install mongodb-database-tools
         run: |
-          curl -L https://fly.io/install.sh | sh
-          echo "$HOME/.fly/bin" >> $GITHUB_PATH
+          curl -fsSL -o mongodb-database-tools.deb \
+            "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-${MONGODB_TOOLS_VERSION}.deb"
+          sudo apt-get install -y ./mongodb-database-tools.deb
+          mongodump --version
 
-      - name: Create DB Snapshot
+      - name: Dump the database
         env:
-          FLY_ACCESS_TOKEN: ${{ secrets.FLY_APP }}
-        run: ~/.fly/bin/flyctl postgres snapshot create
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MONGODB_URI}" ]; then
+            echo "::error::MONGODB_URI secret is not set; nothing to back up"
+            exit 1
+          fi
 
+          archive="ecotrack-$(date -u +%Y%m%dT%H%M%SZ).archive.gz"
+          # --uri carries credentials, so keep it out of the step log.
+          mongodump --uri="${MONGODB_URI}" --archive="${archive}" --gzip --quiet
+
+          # A dump that produced an empty file means the credentials or the
+          # database name are wrong. Fail loudly rather than uploading it.
+          if [ ! -s "${archive}" ]; then
+            echo "::error::mongodump produced an empty archive"
+            exit 1
+          fi
+
+          echo "ARCHIVE=${archive}" >> "${GITHUB_ENV}"
+          echo "Dumped $(du -h "${archive}" | cut -f1) to ${archive}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_BACKUP_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload the archive to S3
+        run: |
+          set -euo pipefail
+          aws s3 cp "${ARCHIVE}" \
+            "s3://${{ secrets.AWS_BACKUP_BUCKET }}/ecotrack/$(date -u +%Y/%m)/${ARCHIVE}" \
+            --storage-class STANDARD_IA
+          echo "Uploaded ${ARCHIVE}"
+
+      - name: Remove the local archive
+        if: always()
+        run: rm -f ./*.archive.gz
