@@ -36,5 +36,10 @@
     "nodemon": "^3.0.2",
     "standard-version": "^9.5.0",
     "supertest": "^7.1.0"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "8.2.6"
+    }
   }
 }
