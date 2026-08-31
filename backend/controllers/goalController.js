@@ -1,7 +1,6 @@
 const Goal = require('../models/Goal');
 const Activity = require('../models/Activity');
 const User = require('../models/User');
-const authMiddleware = require('../utils/authMiddleware');
 
 // Log a new eco-friendly activity
 exports.logActivity = async (req, res, next) => {

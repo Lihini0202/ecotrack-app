@@ -1,6 +1,5 @@
 const QuizScore = require('../models/QuizScore');
 const User = require('../models/User');
-const authMiddleware = require('../utils/authMiddleware');
 
 // Save quiz score
 exports.saveScore = async (req, res, next) => {
