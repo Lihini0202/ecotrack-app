@@ -1,4 +1,4 @@
-name: Daily MongoDB Backup
+name: MongoDB Backup
 
 # Dumps the MongoDB Atlas database with mongodump and stores the archive in
 # S3. Atlas holds all of EcoTrack's persistent state; there is no Postgres
@@ -15,11 +15,15 @@ name: Daily MongoDB Backup
 # Retention is intentionally not handled here: an S3 lifecycle rule on the
 # bucket prefix expires old archives, so no scheduled job needs delete
 # permission on the backup bucket.
+#
+# Manual trigger only until those three secrets exist. Restore the nightly
+# schedule by uncommenting the `schedule` block below; a cron run without
+# credentials configured would fail every night rather than back anything up.
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
   workflow_dispatch:
+  # schedule:
+  #   - cron: '0 0 * * *'
 
 permissions:
   contents: read
