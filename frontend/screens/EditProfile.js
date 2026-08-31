@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
 import axios from 'axios';
+import { API_BASE } from '../config';
 
 const EditProfile = ({ route, navigation }) => {
   const { user } = route.params;
@@ -8,7 +9,7 @@ const EditProfile = ({ route, navigation }) => {
   const [username, setUsername] = useState(user.username);
 
   const handleUpdate = async () => {
-    await axios.put(`http://192.168.56.1:5000/api/profile/${user._id}`, {
+    await axios.put(`${API_BASE}/api/profile/${user._id}`, {
       email, username
     });
     navigation.goBack();

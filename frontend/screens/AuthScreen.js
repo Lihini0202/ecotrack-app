@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE } from '../config';
 
 const AuthScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -19,8 +20,8 @@ const AuthScreen = ({ navigation }) => {
     }
 
     const url = isSignup
-    ? 'http://192.168.56.1:5000/api/auth/register'
-    : 'http://192.168.56.1:5000/api/auth/login';
+    ? `${API_BASE}/api/auth/register`
+    : `${API_BASE}/api/auth/login`;
   
 
     const payload = isSignup

@@ -10,8 +10,9 @@ import {
   Platform
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE } from '../config';
 
-const API_BASE_URL = 'http://192.168.56.1:5000/api/coach'; // Update IP if needed
+const API_BASE_URL = `${API_BASE}/api/coach`; // Update IP if needed
 
 const VirtualCoach = () => {
   const [messages, setMessages] = useState([]);

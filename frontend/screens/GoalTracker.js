@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE } from '../config';
 
 const topics = [
   {
@@ -132,7 +133,7 @@ const GoalTracker = () => {
           return;
         }
 
-        const response = await fetch('http://192.168.56.1:5000/api/goals', {
+        const response = await fetch(`${API_BASE}/api/goals`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

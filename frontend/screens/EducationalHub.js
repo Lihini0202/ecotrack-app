@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_BASE } from '../config';
 
 
 const EducationalHub = () => {
@@ -211,7 +212,7 @@ const EducationalHub = () => {
     try {
       const token = await AsyncStorage.getItem('token');
       await axios.post(
-        'http://192.168.56.1:5000/api/quiz/score',
+        `${API_BASE}/api/quiz/score`,
         {
           score: finalScore,
           totalQuestions: selectedQuestions.length,

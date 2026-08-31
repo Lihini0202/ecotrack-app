@@ -12,6 +12,7 @@ import {
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { API_BASE } from '../config';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -29,7 +30,7 @@ const Profile = () => {
       const token = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
 
-      const res = await axios.get(`http://192.168.56.1:5000/api/profile/${userId}`, {
+      const res = await axios.get(`${API_BASE}/api/profile/${userId}`, {
         headers: { 'x-auth-token': token }
       });
 
@@ -53,7 +54,7 @@ const Profile = () => {
     try {
       const token = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
-      await axios.put(`http://192.168.56.1:5000/api/profile/${userId}`, {
+      await axios.put(`${API_BASE}/api/profile/${userId}`, {
         firstName,
         lastName,
         phone,
@@ -72,7 +73,7 @@ const Profile = () => {
     try {
       const token = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
-      await axios.delete(`http://192.168.56.1:5000/api/profile/${userId}`, {
+      await axios.delete(`${API_BASE}/api/profile/${userId}`, {
         headers: { 'x-auth-token': token }
       });
       await AsyncStorage.clear();

@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from './config';
 
 const handleResponse = async (response) => {
   const data = await response.json();
