@@ -51,12 +51,15 @@ const Profile = () => {
 
   const handleUpdate = async () => {
     try {
+      const token = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
       await axios.put(`http://192.168.56.1:5000/api/profile/${userId}`, {
         firstName,
         lastName,
         phone,
         address
+      }, {
+        headers: { 'x-auth-token': token }
       });
       Alert.alert('Success', 'Profile updated!');
       fetchProfile();
@@ -67,8 +70,11 @@ const Profile = () => {
 
   const handleDelete = async () => {
     try {
+      const token = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
-      await axios.delete(`http://192.168.56.1:5000/api/profile/${userId}`);
+      await axios.delete(`http://192.168.56.1:5000/api/profile/${userId}`, {
+        headers: { 'x-auth-token': token }
+      });
       await AsyncStorage.clear();
       Alert.alert('Account Deleted', 'Your profile has been deleted.');
       navigation.replace('AuthScreen');

@@ -59,7 +59,9 @@ describe('new user end-to-end journey', () => {
       .set('x-auth-token', token);
     expect(afterLogging.body.ecoPoints).toBe(30);
 
-    const profile = await request(app).get(`/api/profile/${userId}`);
+    const profile = await request(app)
+      .get(`/api/profile/${userId}`)
+      .set('x-auth-token', token);
     expect(profile.status).toBe(200);
     expect(profile.body.user.email).toBe(credentials.email);
     expect(profile.body.goals).toHaveLength(3);
