@@ -2,13 +2,17 @@
 
 name: Deploy to Fly.io
 
+# Manual trigger only. The Fly.io organisation backing this app is currently
+# suspended, so a deploy on every push to dev/staging/prod would fail every
+# time. Restore automatic deployment by uncommenting the `push` block once
+# the Fly account is active again.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - dev
-      - staging
-      - prod
+  # push:
+  #   branches:
+  #     - dev
+  #     - staging
+  #     - prod
 
 permissions:
   contents: read

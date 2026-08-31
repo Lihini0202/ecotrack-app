@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -146,13 +147,15 @@ jobs:
       - name: Log tracing placeholder
         run: echo "Send custom metrics to OpenTelemetry / DataDog / Prometheus here"
 
+  # Deployment lives in deploy.yml, which runs the same gates and then
+  # releases on demand. It is kept off the push path because the Fly.io
+  # organisation backing this app is suspended, so an automatic deploy can
+  # only ever fail and would mark every commit on main as broken while the
+  # tests, lint, audit and image build above are all passing.
   deploy:
     name: Deploy to Fly.io
     needs: [unit, integration, e2e, security, docker-build]
-    # This workflow also runs on pull_request, where `needs:` alone would
-    # still let the job proceed. The branch and event guard restricts
-    # deployment to pushes that land on main.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: production
     steps:

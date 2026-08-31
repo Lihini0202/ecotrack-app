@@ -184,7 +184,7 @@ npm audit --audit-level=moderate
 
 Three workflows in `.github/workflows/`:
 
-### `ci.yml` — on push to `main` and on every pull request
+### `ci.yml` — on push to `main`, on every pull request, or manually
 
 | Job | What it does |
 | --- | --- |
@@ -192,17 +192,22 @@ Three workflows in `.github/workflows/`:
 | `security` | `eslint` and `npm audit --audit-level=moderate`, both able to fail the build |
 | `docker-build` | Builds `backend/Dockerfile` so image breakage surfaces before deploy |
 | `observability` | Placeholder step; emits a reminder, no metrics are shipped |
-| `deploy` | Deploys to Fly.io |
+| `deploy` | Deploys to Fly.io, on manual trigger only |
 
 `deploy` requires all of `unit`, `integration`, `e2e`, `security` and
-`docker-build` to pass, and is additionally gated on
-`github.event_name == 'push' && github.ref == 'refs/heads/main'` so that pull
-requests never deploy. It runs in the `production` GitHub environment.
+`docker-build` to pass, and runs in the `production` GitHub environment. It is
+gated on `github.event_name == 'workflow_dispatch'`, so pushes and pull
+requests run the checks but never release.
 
-### `deploy.yml` — on push to `dev`, `staging` or `prod`, or manually
+### `deploy.yml` — manual trigger
 
 Runs the same tests, lint and audit in a `verify` job, then deploys. Nothing
 reaches Fly.io without the suite passing.
+
+Both deploy paths are manual because the Fly.io organisation behind this app is
+suspended; `flyctl` returns `organization is suspended`. The `push` triggers
+are present but commented out in `deploy.yml`, so restoring automatic
+deployment is a one-line change once that account is active.
 
 ### `backup.yml` — manual trigger
 
