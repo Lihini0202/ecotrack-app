@@ -1,5 +1,7 @@
 # EcoTrack
 
+[![CI/CD Pipeline](https://github.com/Lihini0202/ecotrack-app/actions/workflows/ci.yml/badge.svg)](https://github.com/Lihini0202/ecotrack-app/actions/workflows/ci.yml)
+
 A sustainability habit tracker. Users log eco-friendly actions, earn points
 toward a monthly goal, take quizzes, read curated environmental news and chat
 with an AI coach.
@@ -136,19 +138,24 @@ The API listens on port 8080. Check it with:
 curl localhost:8080/health
 ```
 
-### 3. Run the mobile client
+### 3. The mobile client
 
-```bash
-cd frontend
-npm install
-npx expo start
+The Expo client under `frontend/` is committed as source only and cannot be
+started as it stands: there is no `frontend/package.json`, so there is nothing
+for `npm install` or `npx expo start` to read, and `frontend/app.json`
+references four icon and splash images under `frontend/assets/` that are not
+in the repository. Reviving it means initialising an Expo project around the
+existing `App.js`, `index.js` and `screens/`, and supplying those assets.
+
+The API base URL it will use is already centralised in `frontend/config.js`:
+
+```js
+export const API_BASE = 'http://localhost:8080';
 ```
 
-> **Known issue:** the client's API base URL is hard-coded, and inconsistently.
-> `frontend/api.js` points at `http://localhost:5000` while the screen
-> components point at `http://192.168.56.1:5000` — and the backend listens on
-> **8080**, not 5000. Until those are reconciled (ideally into one configurable
-> base URL), the app will not reach the API without editing those files.
+Every screen and `api.js` import from there, so pointing the client at a
+different host is a one-line change. On a physical device, set it to the LAN
+IP of the machine running the API rather than `localhost`.
 
 ### Tests
 
@@ -197,12 +204,16 @@ requests never deploy. It runs in the `production` GitHub environment.
 Runs the same tests, lint and audit in a `verify` job, then deploys. Nothing
 reaches Fly.io without the suite passing.
 
-### `backup.yml` — nightly at 00:00 UTC, or manually
+### `backup.yml` — manual trigger
 
 `mongodump --archive --gzip` of the Atlas database, uploaded to S3 under
 `ecotrack/YYYY/MM/`. The archive is size-checked before upload so bad
 credentials fail the run instead of storing an empty file. AWS access is via
 GitHub OIDC role assumption.
+
+It runs on `workflow_dispatch` only. The nightly `schedule` block is present
+but commented out, because a cron run without the secrets below would fail
+every night instead of backing anything up; uncomment it once they are set.
 
 It needs three repository secrets and fails with a clear message until they
 exist:
