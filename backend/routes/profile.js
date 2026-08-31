@@ -13,9 +13,9 @@ const authMiddleware = require('../utils/authMiddleware');
 const UPDATABLE_FIELDS = ['firstName', 'lastName', 'phone', 'address'];
 
 // Every route below is scoped to the authenticated user. The :userId in the
-// path is kept so existing clients keep working, but it is checked against
-// the token rather than trusted: without this, any caller could read, modify
-// or delete any account by guessing an id.
+// path is retained for client compatibility, but it is verified against the
+// token rather than trusted, so a caller can only ever read, modify or
+// delete their own account.
 router.use('/:userId', authMiddleware, (req, res, next) => {
   if (req.params.userId !== req.userId) {
     return res.status(403).json({ message: 'Forbidden' });

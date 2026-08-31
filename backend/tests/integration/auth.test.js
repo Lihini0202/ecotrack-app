@@ -56,8 +56,8 @@ describe('POST /api/auth/register', () => {
   });
 
   // The schema declares `trim: true`, but express-validator's isEmail() runs
-  // against the raw body first and rejects surrounding whitespace, so the
-  // setter never gets a chance. Documented rather than silently assumed.
+  // against the raw body before mongoose sees it, so surrounding whitespace
+  // is rejected at validation rather than trimmed.
   it('rejects an email padded with whitespace', async () => {
     const res = await request(app)
       .post('/api/auth/register')

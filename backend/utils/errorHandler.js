@@ -8,9 +8,9 @@ const errorHandler = (err, req, res, _next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal Server Error';
 
-  // Mongoose schema failures are bad client input, not server faults. Without
-  // this they surfaced as 500, so a request with an out-of-enum topic looked
-  // identical to a genuine crash.
+  // Mongoose schema failures are bad client input, not server faults, so
+  // they map to 400. An out-of-enum topic is a client error; only genuine
+  // faults fall through to 500.
   if (err.name === 'ValidationError') {
     statusCode = 400;
   } else if (err.name === 'CastError') {

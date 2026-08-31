@@ -101,8 +101,8 @@ describe('PUT /api/profile/:userId', () => {
     expect(stored.ecoPoints).toBe(0);
     expect(stored.email).toBe('ada@example.com');
     // The password must still be the original bcrypt hash, not the
-    // attacker-supplied string. findByIdAndUpdate skips the pre-save hook,
-    // so an unfiltered update would have stored this in plaintext.
+    // caller-supplied string. findByIdAndUpdate bypasses the pre-save hook,
+    // so an unfiltered update stores whatever it is given in plaintext.
     expect(stored.password).not.toBe('plaintext-injection');
     await expect(stored.comparePassword('sup3rsecret')).resolves.toBe(true);
   });

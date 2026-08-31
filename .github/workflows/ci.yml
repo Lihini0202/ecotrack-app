@@ -118,8 +118,8 @@ jobs:
       - run: npm ci
         working-directory: ./backend
 
-      # Both steps previously ended in `|| true`, which discarded their exit
-      # code and made the security gate decorative. They now fail the build.
+      # Both steps are gates: a lint error or a moderate-or-higher advisory
+      # fails the job, and the deploy job below will not run.
       - name: Lint code (SAST)
         run: npx eslint .
         working-directory: ./backend
@@ -149,9 +149,9 @@ jobs:
   deploy:
     name: Deploy to Fly.io
     needs: [unit, integration, e2e, security, docker-build]
-    # needs: alone does not stop this running on pull_request, where the
-    # workflow is also triggered. Without the branch/event guard every PR
-    # would deploy to production.
+    # This workflow also runs on pull_request, where `needs:` alone would
+    # still let the job proceed. The branch and event guard restricts
+    # deployment to pushes that land on main.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production

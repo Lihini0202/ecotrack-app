@@ -1,5 +1,5 @@
-# node:16 reached end of life in September 2023 and receives no security
-# patches. node:20-slim is on LTS and ships a much smaller base image.
+# node:20-slim: an active LTS line still receiving security patches, on a
+# smaller base than the full node image.
 FROM node:20-slim
 
 ENV NODE_ENV=production \

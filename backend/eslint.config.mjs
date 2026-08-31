@@ -12,10 +12,8 @@ export default defineConfig([
     extends: ["js/recommended"],
     languageOptions: {
       ecmaVersion: 2022,
-      // This is a CommonJS Node service, not browser code. The previous
-      // config declared globals.browser, which left require, module,
-      // process and __dirname undefined and made no-undef fire on nearly
-      // every file — invisible only because CI ran eslint with `|| true`.
+      // A CommonJS Node service, not browser code: globals.node is what
+      // defines require, module, process and __dirname for no-undef.
       sourceType: "commonjs",
       globals: globals.node,
     },

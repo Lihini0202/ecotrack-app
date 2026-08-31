@@ -1,11 +1,8 @@
 name: Daily MongoDB Backup
 
 # Dumps the MongoDB Atlas database with mongodump and stores the archive in
-# S3.
-#
-# The previous version of this workflow ran `flyctl postgres snapshot create`.
-# EcoTrack has no Postgres and no Fly volume - it stores everything in Atlas -
-# so that command snapshotted nothing while the job still reported success.
+# S3. Atlas holds all of EcoTrack's persistent state; there is no Postgres
+# and no Fly volume to snapshot.
 #
 # Required repository secrets:
 #   MONGODB_URI          Atlas connection string for a backup user with the

@@ -221,8 +221,8 @@ permission.
 Fly.io, configured by `backend/fly.toml` (app `ecotrackapp`, region `bom`,
 internal port 8080), using the `FLY_APP` secret as the API token.
 `backend/fly.blue.toml` and `backend/fly.green.toml` describe blue/green apps
-but are not referenced by any workflow — a blue/green rollout would have to be
-run by hand today.
+but are not referenced by any workflow, so a blue/green rollout is a manual
+operation.
 
 ---
 

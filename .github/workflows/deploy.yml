@@ -14,9 +14,9 @@ permissions:
   contents: read
 
 jobs:
-  # This workflow used to deploy straight from a push with nothing verifying
-  # the code first, so a broken commit on dev/staging/prod shipped. The same
-  # gate ci.yml applies to main now runs here before anything is deployed.
+  # Deploys to dev, staging and prod pass the same gate ci.yml applies to
+  # main: the full test suite, lint and dependency audit all run here before
+  # the deploy job is allowed to start.
   verify:
     name: Tests and Lint
     runs-on: ubuntu-latest
